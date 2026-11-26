@@ -1,32 +1,39 @@
 import type { Query } from "../parent/Parent";
 
-const DisplayArea = ({ query }: { query: Query[] }) => {
-  console.log("DisplayArea query:", typeof query); // Debugging line to check the value of query
+type DisplayAreaProps = {
+  query: Query[];
+};
+
+const DisplayArea = ({ query }: DisplayAreaProps) => {
   return (
-    <>
-      <div>
-        <h1 className="text-2xl font-bold mb-4">Display Area</h1>
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <p className="text-gray-700">
-            This is the display area where you can show information.
-          </p>
-          {query.length > 0 ? (
-            <div className="mt-4">
-              <h2 className="text-xl font-semibold mb-2">Submitted Queries:</h2>
-              <ul className="list-disc pl-5">
-                {query.map((q, index) => (
-                  <li key={index} className="text-gray-700">
-                    <strong>{q.name}</strong> - {q.email}: {q.query}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <p className="text-gray-500">No queries submitted yet.</p>
-          )}
+    <section className="flex flex-col gap-4">
+      {query.length === 0 ? (
+        <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+          <p className="text-gray-500">No queries submitted yet.</p>
         </div>
-      </div>
-    </>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-xl font-semibold">Submitted Queries</h2>
+
+          {query.map((item) => (
+            <article
+              key={item.id}
+              className="bg-white p-4 rounded-lg border border-gray-300 shadow-md hover:border-blue-500 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">
+                {item.name}
+              </h3>
+
+              <p className="text-sm text-gray-600">{item.email}</p>
+
+              <p className="mt-2 text-gray-700">
+                <span className="font-medium">Query type:</span> {item.query}
+              </p>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
   );
 };
 

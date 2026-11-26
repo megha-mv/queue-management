@@ -1,70 +1,102 @@
-import { useState } from "react";
-import { debounce } from "../../utils/debounceFunc";
+import { useCallback, useState } from "react";
 import type { Query } from "../parent/Parent";
+
+type CustomerFormData = Omit<Query, "id">;
+
+const initialFormData: CustomerFormData = {
+  name: "",
+  email: "",
+  query: "",
+};
 
 const CustomerForm = ({
   setQuery,
 }: {
   setQuery: React.Dispatch<React.SetStateAction<Query[]>>;
 }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    query: "general",
-  });
+  const [formData, setFormData] = useState<CustomerFormData>(initialFormData);
 
-  console.log(formData);
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setQuery((prev) => [...prev, formData]);
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = event.target;
+
+      setFormData((previousData) => ({
+        ...previousData,
+        [name]: value,
+      }));
+    },
+    [],
+  );
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setQuery((previousQueries) => [
+      ...previousQueries,
+      {
+        ...formData,
+        id: crypto.randomUUID(),
+      },
+    ]);
+
+    setFormData(initialFormData);
   };
 
   return (
     <div className="flex flex-col gap-4 justify-start items-center">
       <form
-        className="max-w-lg mx-auto p-4 bg-white rounded-lg shadow-md"
+        className="max-w-lg mx-auto p-4 bg-blue-50 rounded-lg shadow-md"
         onSubmit={handleSubmit}
       >
         <div className="flex flex-col gap-2">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Add Query</h1>
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="name"
+          >
             Name:
             <input
+              id="name"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               name="name"
+              value={formData.name}
               placeholder="Enter your name"
-              onChange={debounce(
-                (e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, name: e.target.value }),
-                300,
-              )}
+              onChange={handleChange}
+              required
             />
           </label>
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="email"
+          >
             Email:
             <input
+              id="email"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="email"
               name="email"
+              value={formData.email}
               placeholder="Enter your email"
-              onChange={debounce(
-                (e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, email: e.target.value }),
-                300,
-              )}
+              onChange={handleChange}
+              required
             />
           </label>
-          <label className="block text-gray-700 text-sm font-bold mb-2">
+
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="query"
+          >
             Query:
             <select
+              id="query"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               name="query"
-              onChange={debounce(
-                (e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setFormData({ ...formData, query: e.target.value }),
-                300,
-              )}
+              value={formData.query}
+              onChange={handleChange}
             >
+              <option value="">--- Select Service ---</option>
               <option value="general">General Inquiry</option>
               <option value="technical">Technical Support</option>
               <option value="billing">Billing</option>
